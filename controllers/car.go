@@ -52,14 +52,12 @@ func UpdateCar(c *fiber.Ctx) error {
 	// 	return output.GetError(c, fiber.StatusBadRequest, err.Error())
 	// }
 
-	res, err := helper.UpdateData(string(constants.Cars), "_id", objId, &car)
+	_, err = helper.UpdateData(string(constants.Cars), "_id", objId, &car)
 	if err != nil {
 		return output.GetError(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	return output.GetSuccess(c, string(constants.SuccessUpdateMessage), fiber.Map{
-		"result": res.UpsertedID,
-	})
+	return output.GetSuccess(c, string(constants.SuccessUpdateMessage), fiber.Map{})
 
 }
 
