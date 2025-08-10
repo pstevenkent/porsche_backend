@@ -34,18 +34,23 @@ func UpdateCar(c *fiber.Ctx) error {
 
 	var car models.Car
 
+	err := c.BodyParser(&car)
+	if err != nil {
+		return output.GetError(c, fiber.StatusBadRequest, err.Error())
+	}
+
 	id := c.Params("id")
 	objId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return output.GetError(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	filter := bson.M{"_id": objId}
+	// filter := bson.M{"_id": objId}
 
-	_, err = helper.RetrieveOneData(filter, string(constants.Cars), &car)
-	if err != nil {
-		return output.GetError(c, fiber.StatusBadRequest, err.Error())
-	}
+	// _, err = helper.RetrieveOneData(filter, string(constants.Cars), &car)
+	// if err != nil {
+	// 	return output.GetError(c, fiber.StatusBadRequest, err.Error())
+	// }
 
 	res, err := helper.UpdateData(string(constants.Cars), "_id", objId, &car)
 	if err != nil {
@@ -55,6 +60,7 @@ func UpdateCar(c *fiber.Ctx) error {
 	return output.GetSuccess(c, string(constants.SuccessUpdateMessage), fiber.Map{
 		"result": res.UpsertedID,
 	})
+
 }
 
 func GetCars(c *fiber.Ctx) error {

@@ -24,6 +24,7 @@ func GetDatabase() *mongo.Database {
 func ConnectDatabase() {
 
 	MONGO_URI := os.Getenv("MONGO_URI")
+	
 	clientOption := options.Client().ApplyURI(MONGO_URI)
 
 	client, err := mongo.Connect(context.Background(), clientOption)

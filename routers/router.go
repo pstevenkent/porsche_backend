@@ -12,7 +12,7 @@ func SetUp(app *fiber.App) {
 
 	app.Get("/api/v1/cars", controllers.GetCars)
 
-	app.Put("/api/v1/cars/:id", controllers.UpdateCar)
+	app.Patch("/api/v1/cars/:id", controllers.UpdateCar)
 
 	app.Delete("/api/v1/cars/:id", controllers.DeleteCar)
 
