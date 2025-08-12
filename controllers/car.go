@@ -13,15 +13,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// AddCar sekarang dimodifikasi untuk menangani multipart/form-data (termasuk file)
+// AddCar sekarang diperbarui untuk menerima CommNr, Price, dan file
 func AddCar(c *fiber.Ctx) error {
-	// 1. Ambil form multipart dari permintaan. Ini bisa menangani teks dan file.
 	form, err := c.MultipartForm()
 	if err != nil {
 		return output.GetError(c, fiber.StatusBadRequest, "Gagal mem-parsing form: "+err.Error())
 	}
 
-	// 2. Ambil semua data teks dari form.
+	// Ambil semua data teks dari form
 	vehicle := form.Value["vehicle"][0]
 	modelYearStr := form.Value["modelyear"][0]
 	exteriorColour := form.Value["exteriorcolour"][0]
@@ -31,28 +30,26 @@ func AddCar(c *fiber.Ctx) error {
 	roofTransport := form.Value["rooftransport"][0]
 	infotainment := form.Value["infotainment"][0]
 	powertrainPerformance := form.Value["powertrainperformance"]
+	commNr := form.Value["commnr"][0]
+	priceStr := form.Value["price"][0]
 
-	// 3. Ambil dan simpan file gambar.
+	// Ambil dan simpan file gambar
 	files := form.File["images"]
 	var imageUrls []string
-
-	// Buat folder 'uploads' di direktori backend jika belum ada.
 	if err := os.MkdirAll("./uploads", 0755); err != nil {
 		return output.GetError(c, fiber.StatusInternalServerError, "Gagal membuat direktori uploads: "+err.Error())
 	}
-
 	for _, file := range files {
-		// Simpan setiap file yang diunggah ke folder lokal.
 		filePath := "./uploads/" + file.Filename
 		if err := c.SaveFile(file, filePath); err != nil {
 			return output.GetError(c, fiber.StatusInternalServerError, "Gagal menyimpan file: "+err.Error())
 		}
-		// Simpan path file untuk dimasukkan ke database.
 		imageUrls = append(imageUrls, filePath)
 	}
 
-	// 4. Buat objek Car baru dengan data yang sudah diproses.
+	// Buat objek Car baru
 	modelYear, _ := strconv.Atoi(modelYearStr)
+	price, _ := strconv.Atoi(priceStr)
 	car := models.Car{
 		Vehicle:               vehicle,
 		ModelYear:             modelYear,
@@ -64,56 +61,56 @@ func AddCar(c *fiber.Ctx) error {
 		RoofTransport:         roofTransport,
 		Infotainment:          infotainment,
 		PowertrainPerformance: powertrainPerformance,
+		CommNr:                commNr,
+		Price:                 price,
 	}
 
-	// 5. Masukkan objek Car ke database.
 	res, err := helper.InsertData(string(constants.Cars), &car)
 	if err != nil {
 		return output.GetError(c, fiber.StatusInternalServerError, err.Error())
 	}
 
-	// Kirim respons sukses.
 	return output.GetSuccess(c, string(constants.SuccessCreateMessage), fiber.Map{
 		"result": res.InsertedID,
 	})
 }
 
-// Fungsi-fungsi di bawah ini tidak diubah dan akan tetap berfungsi.
+// Fungsi lain tidak perlu diubah
 func UpdateCar(c *fiber.Ctx) error {
-	var car models.Car
-	if err := c.BodyParser(&car); err != nil {
-		return output.GetError(c, fiber.StatusBadRequest, err.Error())
-	}
-	id := c.Params("id")
-	objId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return output.GetError(c, fiber.StatusBadRequest, err.Error())
-	}
-	_, err = helper.UpdateData(string(constants.Cars), "_id", objId, &car)
-	if err != nil {
-		return output.GetError(c, fiber.StatusBadRequest, err.Error())
-	}
-	return output.GetSuccess(c, string(constants.SuccessUpdateMessage), fiber.Map{})
+    var car models.Car
+    if err := c.BodyParser(&car); err != nil {
+        return output.GetError(c, fiber.StatusBadRequest, err.Error())
+    }
+    id := c.Params("id")
+    objId, err := primitive.ObjectIDFromHex(id)
+    if err != nil {
+        return output.GetError(c, fiber.StatusBadRequest, err.Error())
+    }
+    _, err = helper.UpdateData(string(constants.Cars), "_id", objId, &car)
+    if err != nil {
+        return output.GetError(c, fiber.StatusBadRequest, err.Error())
+    }
+    return output.GetSuccess(c, string(constants.SuccessUpdateMessage), fiber.Map{})
 }
 
 func GetCars(c *fiber.Ctx) error {
-	var cars []models.Car
-	_, err := helper.RetrieveData(bson.M{}, string(constants.Cars), &cars)
-	if err != nil {
-		return output.GetError(c, fiber.StatusInternalServerError, err.Error())
-	}
-	return output.GetSuccess(c, string(constants.SuccessGetMessage), fiber.Map{"cars": cars})
+    var cars []models.Car
+    _, err := helper.RetrieveData(bson.M{}, string(constants.Cars), &cars)
+    if err != nil {
+        return output.GetError(c, fiber.StatusInternalServerError, err.Error())
+    }
+    return output.GetSuccess(c, string(constants.SuccessGetMessage), fiber.Map{"cars": cars})
 }
 
 func DeleteCar(c *fiber.Ctx) error {
-	id := c.Params("id")
-	objId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return output.GetError(c, fiber.StatusBadRequest, err.Error())
-	}
-	_, err = helper.DeleteData(string(constants.Cars), "_id", objId)
-	if err != nil {
-		return output.GetError(c, fiber.StatusBadRequest, err.Error())
-	}
-	return output.GetSuccess(c, string(constants.SuccessDeleteMessage), fiber.Map{})
+    id := c.Params("id")
+    objId, err := primitive.ObjectIDFromHex(id)
+    if err != nil {
+        return output.GetError(c, fiber.StatusBadRequest, err.Error())
+    }
+    _, err = helper.DeleteData(string(constants.Cars), "_id", objId)
+    if err != nil {
+        return output.GetError(c, fiber.StatusBadRequest, err.Error())
+    }
+    return output.GetSuccess(c, string(constants.SuccessDeleteMessage), fiber.Map{})
 }

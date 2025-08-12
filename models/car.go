@@ -14,4 +14,6 @@ type Car struct {
 	RoofTransport         string             `json:"rooftransport"`
 	PowertrainPerformance []string           `json:"powertrainperformance"`
 	Infotainment          string             `json:"infotainment"`
+	CommNr                string             `json:"commnr"`
+	Price                 int                `json:"price"`
 }
