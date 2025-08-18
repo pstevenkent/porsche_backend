@@ -5,6 +5,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 type Car struct {
 	Id                    primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Images                []string           `json:"images"`
+	Preview               string             `json:"preview"`
 	Vehicle               string             `json:"vehicle"`
 	ModelYear             int                `json:"modelyear"`
 	ExteriorColour        string             `json:"exteriorcolour"`
