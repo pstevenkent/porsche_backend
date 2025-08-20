@@ -24,6 +24,7 @@ type Car struct {
 	EquipmentPackages     string             `json:"equipmentpackages"`
 	WheelColours          string             `json:"wheelcolours"`
 	WheelAccesories       string             `json:"wheelaccesories"`
+	Pdf                   string             `json:"pdf"`
 
 
 	RoofTransport         string             `json:"rooftransport"`
