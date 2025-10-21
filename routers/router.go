@@ -15,5 +15,7 @@ func SetUp(app *fiber.App) {
 	app.Patch("/api/v1/cars/:id", controllers.UpdateCar)
 
 	app.Delete("/api/v1/cars/:id", controllers.DeleteCar)
+	
+	app.Post("/api/v1/upload", controllers.UploadFile)
 
 }

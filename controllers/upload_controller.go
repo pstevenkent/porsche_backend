@@ -1,4 +1,4 @@
-package routers
+package controllers
 
 import (
 	"context"
@@ -10,38 +10,39 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gofiber/fiber/v2"
+    "intern_backend/output" // Menggunakan package output Anda yang sudah ada
 )
 
-// Handler untuk endpoint upload baru Anda
-func HandleFileUpload(c *fiber.Ctx) error {
+// UploadFile adalah controller untuk menangani upload file ke Cloudinary
+func UploadFile(c *fiber.Ctx) error {
 	// 1. Ambil file dari form request
-	fileHeader, err := c.FormFile("file")
+	fileHeader, err := c.FormFile("file") // "file" adalah nama field di form frontend Anda
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "file upload failed"})
+		return output.GetError(c, http.StatusBadRequest, "File is required")
 	}
 
 	// 2. Buka file
 	file, err := fileHeader.Open()
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "cannot open file"})
+		return output.GetError(c, http.StatusInternalServerError, "Cannot open file")
 	}
 	defer file.Close()
 
-	// 3. Panggil fungsi untuk upload ke Cloudinary
+	// 3. Panggil fungsi helper untuk upload ke Cloudinary
 	uploadResult, err := uploadToCloudinary(file, fileHeader.Filename)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		return output.GetError(c, http.StatusInternalServerError, err.Error())
 	}
 
-	// Berhasil! Kembalikan URL aman yang diberikan Cloudinary
-	return c.Status(http.StatusOK).JSON(fiber.Map{
-		"message": "File uploaded successfully to Cloudinary!",
-		"url":     uploadResult.SecureURL, // URL ini yang Anda simpan ke MongoDB
+	// Berhasil! Kembalikan URL menggunakan format respons Anda
+	return output.GetSuccess(c, "File uploaded successfully", fiber.Map{
+		"url": uploadResult.SecureURL, // URL ini yang Anda simpan ke MongoDB
 	})
 }
 
-// Fungsi inti untuk berinteraksi dengan API Cloudinary
+// uploadToCloudinary adalah fungsi helper internal untuk berinteraksi dengan API Cloudinary
 func uploadToCloudinary(file interface{}, fileName string) (*uploader.UploadResult, error) {
+	// Ambil kredensial dari .env
 	cloudName := os.Getenv("CLOUDINARY_CLOUD_NAME")
 	apiKey := os.Getenv("CLOUDINARY_API_KEY")
 	apiSecret := os.Getenv("CLOUDINARY_API_SECRET")
@@ -54,6 +55,7 @@ func uploadToCloudinary(file interface{}, fileName string) (*uploader.UploadResu
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	// Lakukan upload dengan nama file asli sebagai Public ID
 	uploadResult, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{
 		PublicID: fileName,
 	})
