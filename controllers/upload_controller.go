@@ -5,13 +5,15 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings" // <-- Pastikan import ini ada
+	"path/filepath" // <-- DITAMBAHKAN
+	"strings"       // <-- DITAMBAHKAN
 	"time"
+
+	"intern_backend/output"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gofiber/fiber/v2"
-	"intern_backend/output"
 )
 
 // UploadFile adalah controller untuk menangani upload file ke Cloudinary
@@ -48,11 +50,17 @@ func uploadToCloudinary(file interface{}, fileName string) (*uploader.UploadResu
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Beri waktu 30 detik untuk upload
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// --- INI ADALAH LOGIKA BARU YANG MEMPERBAIKI PDF ---
+	// --- LOGIKA BARU UNTUK MEMPERBAIKI PDF DAN .PDF.PDF ---
 	var resourceType string
+
+	// Ambil nama file tanpa ekstensi (z.B. "pricelist_v1")
+	fileStem := strings.TrimSuffix(fileName, filepath.Ext(fileName))
+
+	// Cek apakah itu PDF
 	if strings.HasSuffix(strings.ToLower(fileName), ".pdf") {
 		resourceType = "raw" // Perlakukan PDF sebagai file mentah
 	} else {
@@ -60,7 +68,8 @@ func uploadToCloudinary(file interface{}, fileName string) (*uploader.UploadResu
 	}
 
 	uploadParams := uploader.UploadParams{
-		PublicID:     fileName,
+		// Gunakan nama file tanpa ekstensi sebagai PublicID
+		PublicID:     fileStem,
 		ResourceType: resourceType, // Set resource type di sini
 	}
 	// --- AKHIR DARI LOGIKA BARU ---
