@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath" // <-- DITAMBAHKAN
-	"strings"       // <-- DITAMBAHKAN
+	"strings"
 	"time"
 
 	"intern_backend/output"
@@ -50,14 +50,13 @@ func uploadToCloudinary(file interface{}, fileName string) (*uploader.UploadResu
 		return nil, err
 	}
 
-	// Beri waktu 30 detik untuk upload
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// --- LOGIKA BARU UNTUK MEMPERBAIKI PDF DAN .PDF.PDF ---
+	// --- INI ADALAH LOGIKA YANG MEMPERBAIKI PDF DAN .PDF.PDF ---
 	var resourceType string
-
-	// Ambil nama file tanpa ekstensi (z.B. "pricelist_v1")
+	
+	// Ambil nama file tanpa ekstensi (Contoh: "pricelist_v1")
 	fileStem := strings.TrimSuffix(fileName, filepath.Ext(fileName))
 
 	// Cek apakah itu PDF
@@ -69,7 +68,7 @@ func uploadToCloudinary(file interface{}, fileName string) (*uploader.UploadResu
 
 	uploadParams := uploader.UploadParams{
 		// Gunakan nama file tanpa ekstensi sebagai PublicID
-		PublicID:     fileStem,
+		PublicID:     fileStem, 
 		ResourceType: resourceType, // Set resource type di sini
 	}
 	// --- AKHIR DARI LOGIKA BARU ---
