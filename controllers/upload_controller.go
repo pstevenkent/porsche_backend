@@ -55,7 +55,7 @@ func uploadToCloudinary(file interface{}, fileName string) (*uploader.UploadResu
 
 	// --- INI ADALAH LOGIKA YANG MEMPERBAIKI PDF DAN .PDF.PDF ---
 	var resourceType string
-	
+
 	// Ambil nama file tanpa ekstensi (Contoh: "pricelist_v1")
 	fileStem := strings.TrimSuffix(fileName, filepath.Ext(fileName))
 
@@ -68,7 +68,7 @@ func uploadToCloudinary(file interface{}, fileName string) (*uploader.UploadResu
 
 	uploadParams := uploader.UploadParams{
 		// Gunakan nama file tanpa ekstensi sebagai PublicID
-		PublicID:     fileStem, 
+		PublicID:     fileStem,
 		ResourceType: resourceType, // Set resource type di sini
 	}
 	// --- AKHIR DARI LOGIKA BARU ---
