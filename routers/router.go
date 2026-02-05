@@ -17,5 +17,8 @@ func SetUp(app *fiber.App) {
 	// Mendaftarkan endpoint upload agar bisa dipanggil oleh frontend
 	app.Post("/api/v1/upload", controllers.UploadFile)
 	// ---------------------------
-
+// --- TAMBAHAN BARU: ARCHIVE TOGGLE ---
+    // Method PATCH karena kita hanya mengubah sebagian data (is_archived)
+    app.Patch("/api/v1/cars/:id/archive", controllers.ToggleArchiveCar)
+    // -------------------------------------
 }
