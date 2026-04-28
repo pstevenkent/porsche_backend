@@ -1,3 +1,6 @@
+// Package main is the entry point for the Porsche Catalog Backend API.
+// It initializes the Fiber web server, connects to MongoDB, configures
+// CORS middleware, and registers all API routes.
 package main
 
 import (
@@ -13,26 +16,25 @@ import (
 func main() {
 	app := fiber.New()
 
+	// Load environment variables from .env file (MONGO_URI, DB_NAME, Cloudinary credentials)
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file: ", err.Error())
 	}
 
+	// Establish MongoDB connection and ensure it closes on shutdown
 	config.ConnectDatabase()
 	defer config.DisconnectDatabase()
 
+	// Enable CORS for all origins so the frontend (localhost:5173) can reach the API
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowHeaders: "*",
 	}))
 
-	// // --- TAMBAHKAN BARIS INI ---
-	// // Baris ini akan membuat semua file di dalam folder `./uploads`
-	// // dapat diakses melalui URL, contoh: http://localhost:8080/uploads/namafile.jpg
-	// app.Static("/uploads", "./uploads")
-	// // ---------------------------
-
+	// Register all API route handlers
 	routers.SetUp(app)
 
+	// Start the server on port 8080
 	log.Fatal(app.Listen(":8080"))
 }
