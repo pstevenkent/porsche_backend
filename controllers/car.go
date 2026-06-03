@@ -18,8 +18,8 @@ func AddCar(c *fiber.Ctx) error {
 		return output.GetError(c, fiber.StatusBadRequest, err.Error())
 	}
 	// Default IsArchived false saat create
-	car.IsArchived = false 
-	
+	car.IsArchived = false
+
 	res, err := helper.InsertData(string(constants.Cars), &car)
 	if err != nil {
 		return output.GetError(c, fiber.StatusInternalServerError, err.Error())
@@ -86,7 +86,7 @@ func ToggleArchiveCar(c *fiber.Ctx) error {
 	if err != nil {
 		return output.GetError(c, fiber.StatusInternalServerError, err.Error())
 	}
-	
+
 	// Cek apakah mobil ditemukan
 	if len(cars) == 0 {
 		return output.GetError(c, fiber.StatusNotFound, "Car not found")
@@ -95,9 +95,9 @@ func ToggleArchiveCar(c *fiber.Ctx) error {
 	// 3. Lakukan Toggle (Balik logika)
 	carToUpdate := cars[0]
 	newStatus := !carToUpdate.IsArchived
-	
+
 	// Kita buat map update khusus agar tidak menimpa field lain secara tidak sengaja,
-	// TAPI karena helper.UpdateData Anda sepertinya menerima struct/interface, 
+	// TAPI karena helper.UpdateData Anda sepertinya menerima struct/interface,
 	// kita update struct yang sudah diambil tadi.
 	carToUpdate.IsArchived = newStatus
 
